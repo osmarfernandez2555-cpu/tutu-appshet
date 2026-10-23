@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#be1e6e">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Panel App Ventas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+  <div id="login" class="login hidden">
+    <form id="loginForm" class="login-card" novalidate>
+      <div class="login-head"><div class="logo" aria-hidden="true">T</div><h1>Ventas</h1></div>
+      <p class="sub">Ingresá la contraseña para ver la sección de Ventas. El resto del panel es de uso libre.</p>
+      <label>Contraseña<input type="password" name="password" required autocomplete="current-password"></label>
+      <label>Tu nombre o email <span style="font-weight:400">(queda registrado en los cambios)</span><input type="text" name="nombre" autocomplete="email" placeholder="afernandez@tutuautomotores.com"></label>
+      <button class="btn primary" type="submit" style="min-height:44px">Ingresar</button>
+      <button class="btn" type="button" id="gateCancel" style="min-height:44px">Volver a la zona libre</button>
+      <p id="loginErr" class="err" role="alert"></p>
+    </form>
+  </div>
+
+  <div id="app" class="hidden">
+    <header class="topbar">
+      <button class="icon-btn" id="menuBtn" aria-label="Abrir menú" aria-expanded="false" aria-controls="drawer"><i data-lucide="menu" aria-hidden="true"></i></button>
+      <div class="logo" aria-hidden="true">T</div>
+      <span class="app-name">Panel App Ventas</span>
+      <div class="search" role="search">
+        <i data-lucide="search" aria-hidden="true"></i>
+        <label for="search" class="sr-only">Buscar en la sección</label>
+        <input id="search" type="search" placeholder="Buscar" autocomplete="off">
+      </div>
+      <button class="icon-btn" id="syncBtn" aria-label="Actualizar datos"><i data-lucide="refresh-cw" aria-hidden="true"></i></button>
+      <button class="avatar" id="userBtn" aria-label="Cuenta y menú"></button>
+    </header>
+    <nav id="rail" class="rail" aria-label="Secciones"></nav>
+    <div id="drawerBackdrop" class="drawer-backdrop hidden"></div>
+    <nav id="drawer" class="drawer hidden" aria-label="Menú"></nav>
+    <main id="main" class="main"><div class="loading">Cargando…</div></main>
+  </div>
+
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle"></div>
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+  <script src="/tables.js"></script>
+  <script src="/views.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
