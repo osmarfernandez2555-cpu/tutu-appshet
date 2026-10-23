@@ -18,7 +18,7 @@
     PROPIO: 'blue', CONSIGNACION: 'violet', EXTERNO: 'orange', INVERSOR: 'pink', OK: 'green',
   };
 
-  const S = { me: null, logged: false, protected: new Set(), pend: null, counts: {}, cache: {}, loading: {}, view: null, search: '', sort: {}, month: 'ALL', collapsed: {}, limit: PAGE, cal: null, concMonth: 'ALL', rep: {} };
+  const S = { me: null, logged: false, protected: new Set(), pend: null, pendAction: null, counts: {}, cache: {}, loading: {}, view: null, search: '', sort: {}, month: 'ALL', collapsed: {}, limit: PAGE, cal: null, concMonth: 'ALL', rep: {} };
   const gated = (v) => (v && v.app && v.app.protegida) || (v && v.needLogin);
 
   const icons = () => window.lucide && window.lucide.createIcons();
@@ -122,6 +122,7 @@
       e.target.reset();
       S.logged = true; S.me = await api('/api/me'); S.counts = S.me.counts || {};
       hideGate(); buildNav();
+      if (S.pendAction) { const fn = S.pendAction; S.pendAction = null; S.pend = null; fn(); return; }
       const dest = S.pend; S.pend = null;
       if (dest && location.hash.replace('#/', '') !== dest.id) location.hash = '#/' + dest.id; else render();
     } catch (err) { $('#loginErr').textContent = err.message; } finally { b.disabled = false; b.textContent = 'Ingresar'; }
@@ -140,6 +141,7 @@
     });
     rail += '<div class="sep" aria-hidden="true"></div>' + [TABLES_VIEW, TOOLS].map((v) => `<a href="#/${v.id}" data-id="${v.id}" aria-label="${esc(v.title)}"><i data-lucide="${v.icon}" aria-hidden="true"></i></a>`).join('');
     drawer += '<h4>Panel</h4>' + [TABLES_VIEW, TOOLS].map((v) => `<a href="#/${v.id}" data-id="${v.id}"><i data-lucide="${v.icon}" aria-hidden="true"></i>${esc(v.title)}${v.needLogin && !S.logged ? lockR(true) : ''}</a>`).join('') +
+      `<a href="/galpon/" target="_blank" rel="noopener"><i data-lucide="box" aria-hidden="true"></i>Galpón 3D</a>` +
       (S.logged ? `<hr><a href="#" id="logoutLink"><i data-lucide="log-out" aria-hidden="true"></i>Salir de Ventas (${esc(S.me.nombre)})</a>` : '<hr><a href="#" id="loginLink"><i data-lucide="lock" aria-hidden="true"></i>Ingresar a Ventas</a>');
     $('#rail').innerHTML = rail; $('#drawer').innerHTML = drawer;
     const ll = $('#logoutLink'); if (ll) ll.onclick = (e) => { e.preventDefault(); logoutVentas(); };
@@ -655,6 +657,7 @@
   function renderWelcome(m) {
     m.innerHTML = `<div class="welcome"><h2>Panel vacío</h2>
       <p>Todavía no hay datos cargados. Subí el archivo <strong>panel-datos.json.gz</strong> (el respaldo que se generó desde AppSheet) para cargar las dos apps de una vez.</p>
+      <p class="note" style="color:var(--muted)">La primera carga pide la contraseña de Ventas (<strong>Tutu2026</strong>): al elegir el archivo te la va a preguntar.</p>
       <div class="drop" id="drop" tabindex="0" role="button" aria-label="Elegir archivo"><i data-lucide="upload-cloud" aria-hidden="true"></i><p>Arrastrá el archivo acá o tocá para elegirlo</p></div>
       <input type="file" id="seedFile" accept=".gz,.json" class="sr-only">
       <div id="seedProgress"></div></div>`;
@@ -666,6 +669,7 @@
     icons();
   }
   async function subirSeed(file, reemplazar) {
+    if (!S.logged) { S.pendAction = () => subirSeed(file, reemplazar); showGate(null); return; }
     const p = $('#seedProgress'); if (p) p.innerHTML = '<div class="progress"><div></div></div><p class="note" style="color:var(--muted);text-align:center">Subiendo y cargando… puede tardar un minuto.</p>';
     try {
       const buf = await file.arrayBuffer();
